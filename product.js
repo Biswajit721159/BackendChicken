@@ -5,11 +5,11 @@ const client = new MongoClient(url);
 const database='Chicken'
 
 
-async function dbconnect_chicken()
+async function dbconnect_product()
 {
   let result=await client.connect();
   let db=result.db(database)
   return db.collection('product');
 }
 
-module.exports=dbconnect_chicken
+module.exports=dbconnect_product
