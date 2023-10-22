@@ -5,11 +5,13 @@ var ObjectID = require("bson-objectid");
 let app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(cors());
+// const multer = require('multer');
 
 
 let dbconnect_product = require("./product");
 
-mongoose.connect("mongodb+srv://biswajit2329:T1voipAip4RSgv97@cluster0.fw5wwvc.mongodb.net/Chicken?retryWrites=true&w=majority");
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage: storage });
 
 //Reviews section
 
