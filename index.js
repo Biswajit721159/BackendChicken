@@ -5,8 +5,10 @@ var ObjectID = require("bson-objectid");
 let app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(cors());
+let bcrypt =require("bcryptjs");
 
-
+let Jwt = require("jsonwebtoken");
+const jwtKey = "Chicken";
 
 let dbconnect_product = require("./product");
 let dbconnect_user=require("./user")
