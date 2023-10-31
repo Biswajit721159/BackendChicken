@@ -9,12 +9,13 @@ app.use(cors());
 
 
 let dbconnect_product = require("./product");
+let dbconnect_user=require("./user")
 
 
 app.patch("/login", async (req, resp) => {
   if (req.body.email && req.body.password) 
   {
-    let data = await dbconnect_product();
+    let data = await dbconnect_user();
     let password=req.body.password
     
     let user = await data.findOne({
@@ -48,7 +49,7 @@ app.patch("/login", async (req, resp) => {
 });
 
 app.post("/register", async (req, resp) => {
-  let data = await dbconnect_product();
+  let data = await dbconnect_user();
   let password=req.body.password
   const salt = await bcrypt.genSalt();
   const passwordHash = await bcrypt.hash(password, salt);
