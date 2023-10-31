@@ -63,7 +63,6 @@ app.post("/register", async (req, resp) => {
   });
   delete req.body.password
   let user=req.body
-
   if (result.acknowledged) 
   {
       Jwt.sign({ user }, jwtKey, (error, token) => {
