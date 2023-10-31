@@ -5,14 +5,77 @@ var ObjectID = require("bson-objectid");
 let app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(cors());
-// const multer = require('multer');
+
+
 
 let dbconnect_product = require("./product");
 
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage: storage });
 
-//Reviews section
+app.patch("/login", async (req, resp) => {
+  if (req.body.email && req.body.password) 
+  {
+    let data = await dbconnect_product();
+    let password=req.body.password
+    
+    let user = await data.findOne({
+      email:req.body.email
+    });
+    if(user==null) resp.send("user no found");
+    else
+    {
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(isMatch==false)
+        {
+          resp.send("user no found");
+        }
+        delete user.password
+        if (user) {
+            Jwt.sign({ user }, jwtKey, (error, token) => {
+                if (error) {
+                  resp.send({ message: "We find some error" });
+                }
+                resp.send({ user, auth: token });
+            });
+        } else {
+          resp.send("user no found");
+        }
+      } 
+    }
+  else
+  {
+    resp.send("user not found");
+  }
+});
+
+app.post("/register", async (req, resp) => {
+  let data = await dbconnect_product();
+  let password=req.body.password
+  const salt = await bcrypt.genSalt();
+  const passwordHash = await bcrypt.hash(password, salt);
+
+  let result = await data.insertOne({
+    name:req.body.name,
+    email:req.body.email,
+    password:passwordHash
+  });
+  delete req.body.password
+  let user=req.body
+
+  if (result.acknowledged) 
+  {
+      Jwt.sign({ user }, jwtKey, (error, token) => {
+          if (error) 
+          {
+            resp.send({ message: "We find some error" });
+          }
+          resp.send({ user, auth: token });
+      });
+  } 
+  else 
+  {
+    resp.send("user no found");
+  }
+});
 
 app.patch("/foundType", async (req, res) => {
   let result = await dbconnect_product();
