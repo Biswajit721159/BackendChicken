@@ -5,76 +5,82 @@ var ObjectID = require("bson-objectid");
 let app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(cors());
-let bcrypt =require("bcryptjs");
+let bcrypt = require("bcryptjs");
 
 let Jwt = require("jsonwebtoken");
 const jwtKey = "Chicken";
 
 let dbconnect_product = require("./product");
-let dbconnect_user=require("./user")
+let dbconnect_user = require("./user");
 
+app.get("/getproduct", async (req, res) => {
+  let result = await dbconnect_product();
+  let data = await result.find().toArray();
+  let nums = req.body.product_ids;
+  let ans = [];
+  console.log(nums);
+  for (let i = 0; i < nums.length; i++) {
+    for (let j = 0; j < data.length; j++) {
+      if (data[j]._id == nums[i]) {
+        ans.push(data[j]);
+      }
+    }
+  }
+  res.send(ans);
+});
 
 app.patch("/login", async (req, resp) => {
-  if (req.body.email && req.body.password) 
-  {
+  if (req.body.email && req.body.password) {
     let data = await dbconnect_user();
-    let password=req.body.password
-    
+    let password = req.body.password;
+
     let user = await data.findOne({
-      email:req.body.email
+      email: req.body.email,
     });
-    if(user==null) resp.send("user no found");
-    else
-    {
-        const isMatch = await bcrypt.compare(password, user.password);
-        if(isMatch==false)
-        {
-          resp.send("user no found");
-        }
-        delete user.password
-        if (user) {
-            Jwt.sign({ user }, jwtKey, (error, token) => {
-                if (error) {
-                  resp.send({ message: "We find some error" });
-                }
-                resp.send({ user, auth: token });
-            });
-        } else {
-          resp.send("user no found");
-        }
-      } 
+    if (user == null) resp.send("user no found");
+    else {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch == false) {
+        resp.send("user no found");
+      }
+      delete user.password;
+      if (user) {
+        Jwt.sign({ user }, jwtKey, (error, token) => {
+          if (error) {
+            resp.send({ message: "We find some error" });
+          }
+          resp.send({ user, auth: token });
+        });
+      } else {
+        resp.send("user no found");
+      }
     }
-  else
-  {
+  } else {
     resp.send("user not found");
   }
 });
 
 app.post("/register", async (req, resp) => {
   let data = await dbconnect_user();
-  let password=req.body.password
+  let password = req.body.password;
   const salt = await bcrypt.genSalt();
   const passwordHash = await bcrypt.hash(password, salt);
 
   let result = await data.insertOne({
-    name:req.body.name,
-    email:req.body.email,
-    password:passwordHash
+    name: req.body.name,
+    email: req.body.email,
+    password: passwordHash,
   });
-  delete req.body.password
-  let user=req.body
-  if (result.acknowledged) 
-  {
-      Jwt.sign({ user }, jwtKey, (error, token) => {
-          if (error) 
-          {
-            resp.send({ message: "We find some error" });
-          }
-          resp.send({ user, auth: token });
-      });
-  } 
-  else 
-  {
+  delete req.body.password;
+  let user = req.body;
+  if (result.acknowledged) {
+    Jwt.sign({ user }, jwtKey, (error, token) => {
+      if (error) {
+        resp.send({ message: "We find some error" });
+      }
+      resp.send({ user, auth: token });
+    });
+  } else {
     resp.send("user no found");
   }
 });
@@ -98,7 +104,6 @@ app.patch("/foundType", async (req, res) => {
   } else {
     ans = data;
   }
-
 
   obj = {};
   if (page == 0) obj["prev"] = false;
