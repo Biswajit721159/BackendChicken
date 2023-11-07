@@ -13,7 +13,7 @@ const jwtKey = "Chicken";
 let dbconnect_product = require("./product");
 let dbconnect_user = require("./user");
 
-app.get("/getproduct", async (req, res) => {
+app.patch("/getproduct", async (req, res) => {
   let result = await dbconnect_product();
   let data = await result.find().toArray();
   let nums = req.body.product_ids;
