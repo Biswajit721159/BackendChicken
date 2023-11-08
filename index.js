@@ -69,6 +69,7 @@ app.post("/register", async (req, resp) => {
   let result = await data.insertOne({
     name: req.body.name,
     email: req.body.email,
+    phone:req.body.phone,
     password: passwordHash,
   });
   delete req.body.password;
