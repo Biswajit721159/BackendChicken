@@ -12,6 +12,15 @@ const jwtKey = "Chicken";
 
 let dbconnect_product = require("./product");
 let dbconnect_user = require("./user");
+let dbconnect_order=require('./order')
+
+
+app.post("/pushorder",async(req,res)=>{
+  let data=await dbconnect_order();
+  let result = await data.insertOne(req.body);
+  if(result.acknowledged==true) res.send({status:200});
+  else res.send({status:401})
+})
 
 app.patch("/getproduct", async (req, res) => {
   let result = await dbconnect_product();
