@@ -14,6 +14,11 @@ let dbconnect_product = require("./product");
 let dbconnect_user = require("./user");
 let dbconnect_order=require('./order')
 
+app.patch("/getRecord",async(req,res)=>{
+  let data=await dbconnect_order();
+  let result = await data.find({email:req.body.email}).toArray();
+  res.send(result)
+})
 
 app.post("/pushorder",async(req,res)=>{
   let data=await dbconnect_order();
