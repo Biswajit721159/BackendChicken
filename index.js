@@ -14,6 +14,29 @@ let dbconnect_product = require("./product");
 let dbconnect_user = require("./user");
 let dbconnect_order=require('./order')
 
+
+
+
+app.put('/update/:_id',async(req,res)=>{
+  let data = await dbconnect_product();
+  console.log(req.params._id)
+  let result = await data.updateOne(
+      { _id: new mongoose.mongo.BSON.ObjectId(req.params._id) },
+      { $set: { product_name: req.body.product_name , quantity:req.body.quantity , price:req.body.price 
+         , offer:req.body.offer  , product_type:req.body.product_type   ,  rating:req.body.rating} }
+  )
+  console.log(result)
+  if(result.acknowledged==true)
+  {
+    res.send({status:200})
+  }
+  else
+  {
+    res.send({status:401})
+  }
+})
+
+
 app.patch("/getRecord",async(req,res)=>{
   let data=await dbconnect_order();
   let result = await data.find({email:req.body.email}).toArray();
@@ -32,7 +55,6 @@ app.patch("/getproduct", async (req, res) => {
   let data = await result.find().toArray();
   let nums = req.body.product_ids;
   let ans = [];
-  console.log(nums);
   for (let i = 0; i < nums.length; i++) {
     for (let j = 0; j < data.length; j++) {
       if (data[j]._id == nums[i]) {
