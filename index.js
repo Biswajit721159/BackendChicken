@@ -40,6 +40,7 @@ app.put('/update/:_id',async(req,res)=>{
 app.patch("/getRecord",async(req,res)=>{
   let data=await dbconnect_order();
   let result = await data.find({email:req.body.email}).toArray();
+  result.reverse();
   res.send(result)
 })
 
