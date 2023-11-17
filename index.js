@@ -99,27 +99,36 @@ app.patch("/login", async (req, resp) => {
 
 app.post("/register", async (req, resp) => {
   let data = await dbconnect_user();
-  let password = req.body.password;
-  const salt = await bcrypt.genSalt();
-  const passwordHash = await bcrypt.hash(password, salt);
+  let anyuserpresent=await data.findOne({email:req.body.email})
 
-  let result = await data.insertOne({
-    name: req.body.name,
-    email: req.body.email,
-    phone:req.body.phone,
-    password: passwordHash,
-  });
-  delete req.body.password;
-  let user = req.body;
-  if (result.acknowledged) {
-    Jwt.sign({ user }, jwtKey, (error, token) => {
-      if (error) {
-        resp.send({ message: "We find some error" });
+  if(anyuserpresent==null)
+  {
+      let password = req.body.password;
+      const salt = await bcrypt.genSalt();
+      const passwordHash = await bcrypt.hash(password, salt);
+
+      let result = await data.insertOne({
+        name: req.body.name,
+        email: req.body.email,
+        phone:req.body.phone,
+        password: passwordHash,
+      });
+      delete req.body.password;
+      let user = req.body;
+      if (result.acknowledged) {
+        Jwt.sign({ user }, jwtKey, (error, token) => {
+          if (error) {
+            resp.send({ message: "We find some error" });
+          }
+          resp.send({ user, auth: token });
+        });
+      } else {
+        resp.send("user no found");
       }
-      resp.send({ user, auth: token });
-    });
-  } else {
-    resp.send("user no found");
+  }
+  else
+  {
+    resp.send({status:300,message:"user is already exit"})
   }
 });
 
